@@ -193,6 +193,11 @@
       <version>${version.resteasy}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>org.jboss.as.plugins</groupId>
+    	<artifactId>jboss-as-maven-plugin</artifactId>
+    	<version>7.4.Final</version>
+    </dependency>
   </dependencies>
 
   <build>
