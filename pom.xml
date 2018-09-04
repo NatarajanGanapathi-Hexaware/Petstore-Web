@@ -40,6 +40,11 @@
     <version.maven.surefire.plugin>2.19.1</version.maven.surefire.plugin>
     <version.maven.failsafe.plugin>2.19.1</version.maven.failsafe.plugin>
     <version.swagger.plugin>3.1.6</version.swagger.plugin>
+    <!-- Maven Deploy -->
+    <hostname>localhost</hostname>
+    <username>admin</username>
+    <password>username</password>
+    <filename>applicationPetstore.war</filename>
     <!-- Project -->
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -193,17 +198,33 @@
       <version>${version.resteasy}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-    	<groupId>org.jboss.as.plugins</groupId>
-    	<artifactId>jboss-as-maven-plugin</artifactId>
-    	<version>7.4.Final</version>
-    </dependency>
   </dependencies>
 
   <build>
     <finalName>applicationPetstore</finalName>
     <pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.wildfly.plugins</groupId>
+        <artifactId>wildfly-maven-plugin</artifactId>
+        <version>1.1.0.Alpha10</version>
+        <executions>
+          <execution>
+            <phase>install</phase>
+            <goals>
+              <goal>redeploy</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <force>true</force>
+          <hostname>${hostname}</hostname>
+          <port>${port}</port>
+          <username>${username}</username>
+          <password>${password}</password>
+          <filename>${filename}</filename>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>${version.maven.war.plugin}</version>
