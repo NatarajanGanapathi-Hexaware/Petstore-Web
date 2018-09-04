@@ -98,7 +98,14 @@ public class Mapper
 				); 
 		return dest;
 	}
-	
+	public static PurchaseOrder Map(PurchaseOrderDto src) {
+		PurchaseOrder dest = new PurchaseOrder(
+			Mapper.Map(src.getCustomer()),
+			Mapper.Map(src.getCreditCard()),
+			Mapper.Map(src.getDeliveryAddress())
+				); 
+		return dest;
+	}
 	
 	// Reverse Map
 	public static PurchaseOrderDto Map(PurchaseOrder src) {
