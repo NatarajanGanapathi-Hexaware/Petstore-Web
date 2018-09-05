@@ -44,7 +44,7 @@
     <hostname>localhost</hostname>
     <username>admin</username>
     <password>username</password>
-    <filename>applicationPetstore.war</filename>
+    <filename>applicationPetstore-web.war</filename>
     <!-- Project -->
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
