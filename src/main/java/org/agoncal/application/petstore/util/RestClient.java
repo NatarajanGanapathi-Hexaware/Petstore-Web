@@ -8,7 +8,7 @@ import javax.ws.rs.core.Response;
 
 public class RestClient
 {
-	private static final String BaseUrl= "http://localhost:8083/applicationPetstore/rest";
+	public static final String ApiURL= System.getenv("PETSTORE-API-URL");
 	public static <T> T get(Class<T> type, String path) 
 	{
 		Response res = getBuilder(path).get();
@@ -17,10 +17,6 @@ public class RestClient
 	}
 	public static <T> T post(Class<T> type, String path, Entity<?> entity) 
 	{
-//		Invocation.Builder builder = ClientBuilder.newClient().target("http://localhost:8083/applicationPetstore/rest/purchaseOrder").request(MediaType.APPLICATION_JSON);
-//		Response res = builder.post(entity);
-//		T data = isValid(res) ? res.readEntity(type): null;
-//		return data;
 		Response res = getBuilder(path).post(entity);
 		T data =  isValid(res) ? res.readEntity(type) : null;
 		return data;
@@ -42,9 +38,11 @@ public class RestClient
 		return true;
 	}
 	private static Invocation.Builder getBuilder(String path) {
+		String url = ApiURL+ "/applicationPetstore/rest";
+		System.out.println(url + "/" + path);
 		return ClientBuilder
 				.newClient()
-				.target(BaseUrl)
+				.target(url)
 				.path(path)
 				.request(MediaType.APPLICATION_JSON);
 	}
