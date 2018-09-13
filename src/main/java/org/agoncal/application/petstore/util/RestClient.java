@@ -8,7 +8,7 @@ import javax.ws.rs.core.Response;
 
 public class RestClient
 {
-	public static final String ApiURL= System.getenv("PETSTORE-API-URL");
+	public static final String ApiURL= System.getenv("PETSTORE-API-URL")== null ? "http://127.0.0.1:8081" : System.getenv("PETSTORE-API-URL");
 	public static <T> T get(Class<T> type, String path) 
 	{
 		Response res = getBuilder(path).get();
