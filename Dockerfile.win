@@ -1,0 +1,55 @@
+FROM microsoft/windowsservercore  
+
+ENV JBOSS_HOME C:/wildfly-11.0.0.Final
+ENV POSTGRESQL_VERSION 9.4-1201-jdbc41
+ENV JAVA_HOME=C:/Java/jre1.8.0_91
+
+ARG DB_HOST=postgresql
+ARG DB_NAME=postgresdb
+ARG DB_USER=postgres
+ARG DB_PASS=irtt
+
+# Install JAVA JRE
+RUN powershell (new-object System.Net.WebClient).Downloadfile('http://javadl.oracle.com/webapps/download/AutoDL?BundleId=210185', 'C:\jre-8u91-windows-x64.exe')
+RUN powershell start-process -filepath C:\jre-8u91-windows-x64.exe -passthru -wait -argumentlist "/s,INSTALLDIR=c:\Java\jre1.8.0_91,/L,install64.log"
+RUN del C:\jre-8u91-windows-x64.exe
+
+# Install Wildfly Server
+RUN powershell (new-object System.Net.WebClient).Downloadfile('http://download.jboss.org/wildfly/11.0.0.Final/wildfly-11.0.0.Final.zip', 'C:\wildfly-11.0.0.Final.zip')
+RUN powershell Expand-Archive -Path "C:\wildfly-11.0.0.Final.zip" -DestinationPath "C:\\"
+RUN del C:\wildfly-11.0.0.Final.zip
+
+# Add Wildfly User
+
+RUN powershell C:\wildfly-11.0.0.Final\bin\add-user.bat admin password  --silent
+
+# RUN Wildfly Server 
+RUN powershell start-process C:\wildfly-11.0.0.Final\bin\standalone.bat && \
+    powershell sleep 10 && \
+    powershell mkdir tmp && cd /tmp && \
+    powershell (new-object System.Net.WebClient).Downloadfile('http://search.maven.org/remotecontent?filepath=org/postgresql/postgresql/9.4-1201-jdbc41/postgresql-9.4-1201-jdbc41.jar', 'C:\tmp\postgresql-9.4-1201-jdbc41.jar') && \
+    powershell C:\wildfly-11.0.0.Final\bin\jboss-cli.bat --connect --command='data-source remove --name=ExampleDS' && \
+    powershell C:\wildfly-11.0.0.Final\bin\jboss-cli.bat --connect --command='module add --name=org.postgresql --resources=c:/tmp/postgresql-9.4-1201-jdbc41.jar --dependencies=javax.api,javax.transaction.api' && \
+    powershell C:\wildfly-11.0.0.Final\bin\jboss-cli.bat --connect --command='/subsystem=datasources/jdbc-driver=postgres:add(driver-name="postgres",driver-module-name="org.postgresql",driver-class-name=org.postgresql.Driver)' && \
+    powershell C:\wildfly-11.0.0.Final\bin\jboss-cli.bat --connect --command='data-source add --jndi-name=java:jboss/datasources/ExampleDS --name=ExampleDS --connection-url=jdbc:postgresql://172.31.92.76:5432/postgresdb --driver-name=postgres --user-name=postgres --password=irtt' && \
+    powershell C:\wildfly-11.0.0.Final\bin\jboss-cli.bat --connect --command=:shutdown 
+    # powershell del C:\wildfly-11.0.0.Final\standalone\configuration\standalone_xml_history\* && \
+    # powershell del C:\wildfly-11.0.0.Final\standalone\log\* && \
+    # powershell del /postgresql-9.4*.jar && \
+    # powershell del -rf /postgresql-*.jar 
+
+ADD ./target/applicationPetstore.war C:\wildfly-11.0.0.Final\standalone\deployments\applicationPetstore.war
+
+EXPOSE 9990
+EXPOSE 8080
+
+ENTRYPOINT "C:\wildfly-11.0.0.Final\bin\standalone.bat"
+
+CMD ["-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
+
+
+# Build
+# Docker build -t petstore-web:1.0.0 .
+
+#Run
+# Docker run -it -p 9990:9990 --rm -d petstore-web:1.0.0
