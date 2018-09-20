@@ -38,7 +38,7 @@ RUN powershell start-process C:\wildfly-11.0.0.Final\bin\standalone.bat && \
     # powershell del /postgresql-9.4*.jar && \
     # powershell del -rf /postgresql-*.jar 
 
-ADD ./target/applicationPetstore.war C:\wildfly-11.0.0.Final\standalone\deployments\applicationPetstore.war
+COPY ./target/applicationPetstore.war C:\wildfly-11.0.0.Final\standalone\deployments\applicationPetstore.war
 
 EXPOSE 9990
 EXPOSE 8080
